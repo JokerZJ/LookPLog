@@ -49,15 +49,12 @@
 |----|------|
 | **Project name** | 随意，如 `lookplog`（决定 `xxx.pages.dev` 域名） |
 | **Production branch** | `master` 或 `main`（与你 GitHub 默认分支一致） |
-| **Framework preset** | `Vite`（没有就选 None） |
 | **Build command** | `npm run build` |
-| **Deploy command** | `npx wrangler deploy`（**不要留空**，留空会报 Invalid request body） |
-| **Root directory** | **留空** 或 `.`（**不要填 `/`**） |
-| **Build output / assets** | 由仓库 `wrangler.toml` 的 `[assets] directory = "./dist"` 指定 |
+| **Deploy command** | `npx wrangler deploy`（不要留空） |
+| **Root directory** | 留空或 `.`（不要填 `/`） |
 
-> 若 Deploying 报错 `Missing entry-point ... assets directory`：  
-> 把最新 `wrangler.toml` push 到 GitHub 后再 Retry。  
-> 临时也可把 Deploy command 写成：`npx wrangler deploy --assets=./dist` |
+SPA 路由由 `workers/spa-fallback.js` + `wrangler.toml` 的 Assets binding 处理。  
+**不要**使用 `public/_redirects` 或 `not_found_handling = "single-page-application"`（会触发 Infinite loop / code 100324）。
 
 ### 4. 环境变量（必填）
 
