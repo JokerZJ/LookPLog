@@ -1,0 +1,5 @@
+# Netlify SPA 回退（仅 Netlify 使用；Cloudflare 用 wrangler.toml 的 not_found_handling）
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

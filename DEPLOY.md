@@ -17,8 +17,12 @@
 | `VITE_SUPABASE_ANON_KEY` | anon / public key |
 
 项目已包含：
-- `public/_redirects`（SPA 路由回退）
-- `wrangler.toml`（Cloudflare 输出目录提示）
+- `wrangler.toml`（Cloudflare：`dist` + SPA 回退）
+- `netlify.toml`（Netlify SPA 回退，可选）
+- `vercel.json`（Vercel SPA 回退）
+
+> 不要在 Cloudflare 项目里使用 `public/_redirects` 的 `/* /index.html 200`，  
+> 会与 Workers 静态资源部署冲突并报 `Infinite loop detected`（code 100324）。
 
 ---
 
