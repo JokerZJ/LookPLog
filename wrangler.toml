@@ -1,8 +1,13 @@
-# Cloudflare Pages
-# 构建命令: npm run build
-# 输出目录: dist
+# Cloudflare：静态前端（Vite 构建产物在 dist）
+# Git 连接 Pages 时，控制台请设置：
+#   Build command: npm run build
+#   Build output directory: dist
+#   Deploy command: 留空（不要填 npx wrangler deploy）
 
 name = "lookplog"
-compatibility_date = "2024-01-01"
+compatibility_date = "2024-11-12"
 
-pages_build_output_dir = "dist"
+# 静态资源目录（解决 Missing entry-point / assets directory）
+[assets]
+directory = "./dist"
+not_found_handling = "single-page-application"

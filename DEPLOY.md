@@ -1,97 +1,120 @@
 # LookPlog 免费发布指南（手机可用）
 
-本项目是 Vite 静态站点 + Supabase 后端，可用 **Vercel** 或 **Cloudflare Pages** 免费托管。
+本项目是 Vite 静态站点 + Supabase 后端。
+
+> **国内访问建议优先用 Cloudflare Pages**（`*.pages.dev`）。  
+> Vercel（`*.vercel.app`）在国内常出现「无法访问此网站」。
 
 ## 发布前准备
 
-1. 代码推到 GitHub（不要提交 `.env`）
-2. 确认本地能构建成功：
-
-```bash
-npm run build
-```
-
-3. 准备两个环境变量（来自 Supabase → Project Settings → API）：
+1. 代码已推到 GitHub（不要提交 `.env`）
+2. 本地确认构建成功：`npm run build`
+3. 准备 Supabase 环境变量（Dashboard → Project Settings → API）：
 
 | 变量名 | 说明 |
 |--------|------|
 | `VITE_SUPABASE_URL` | Project URL |
 | `VITE_SUPABASE_ANON_KEY` | anon / public key |
 
----
-
-## 方案 A：Vercel（推荐，步骤最少）
-
-1. 打开 [vercel.com](https://vercel.com) ，用 GitHub 登录
-2. **Add New Project** → 导入本仓库
-3. Framework Preset 选 **Vite**（一般会自动识别）
-4. 在 **Environment Variables** 填入：
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-5. 点击 **Deploy**
-6. 部署完成后得到类似：`https://lookplog-xxx.vercel.app`
-
-项目根目录已有 `vercel.json`，负责 SPA 路由回退。
+项目已包含：
+- `public/_redirects`（SPA 路由回退）
+- `wrangler.toml`（Cloudflare 输出目录提示）
 
 ---
 
-## 方案 B：Cloudflare Pages
+## 方案 A：Cloudflare Pages（推荐，国内更易打开）
 
-1. 打开 [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages** → **Create** → **Pages**
-2. 连接 GitHub 仓库
-3. 构建设置：
-   - Build command: `npm run build`
-   - Build output directory: `dist`
-4. 在 **Environment variables** 添加同上两个 `VITE_*` 变量
-5. Save and Deploy
+### 1. 登录并创建 Pages 项目
 
-`public/_redirects` 与 `wrangler.toml` 已配置好 SPA 回退。
+1. 打开 [https://dash.cloudflare.com](https://dash.cloudflare.com)
+2. 注册 / 登录（可用邮箱，或用 Google 等）
+3. 左侧进入 **Workers & Pages**（有的界面叫 **Compute (Workers)** → **Workers & Pages**）
+4. 点 **Create** → 选 **Pages** → **Connect to Git**
+
+### 2. 连接 GitHub
+
+1. 选择 **GitHub**，授权 Cloudflare 访问仓库
+2. 选中本项目仓库（如 `lookPlog` / `look-p-log`）
+3. 点 **Begin setup**
+
+若看不到仓库：在 GitHub → Settings → Applications → Cloudflare Pages 里打开仓库权限。
+
+### 3. 构建设置
+
+| 项 | 填写 |
+|----|------|
+| **Project name** | 随意，如 `lookplog`（决定 `xxx.pages.dev` 域名） |
+| **Production branch** | `master` 或 `main`（与你 GitHub 默认分支一致） |
+| **Framework preset** | `Vite`（没有就选 None） |
+| **Build command** | `npm run build` |
+| **Build output directory** | `dist` |
+| **Deploy command** | **留空**（不要填 `npx wrangler deploy`） |
+| **Root directory** | 留空（代码在仓库根目录） |
+
+> 若 Deploying 报错 `Missing entry-point to Worker script or to assets directory`：  
+> 说明误用了 `npx wrangler deploy`。到 Settings → Builds 清空 Deploy command，Output 设为 `dist`，再 Retry。 |
+
+### 4. 环境变量（必填）
+
+在同一页找到 **Environment variables**（或 Deploy 后再进 Settings → Environment variables）：
+
+1. `VITE_SUPABASE_URL` = 你的 Supabase Project URL  
+2. `VITE_SUPABASE_ANON_KEY` = 你的 anon public key  
+
+建议 **Production** 和 **Preview** 都加上。
+
+> Vite 的环境变量在**构建时**写入前端包。改变量后必须重新部署一次。
+
+### 5. 部署
+
+点 **Save and Deploy**，等 1～3 分钟。成功后地址类似：
+
+`https://lookplog.pages.dev`
+
+（具体以 Cloudflare 页面显示为准）
+
+### 6. 配置 Supabase（必做）
+
+1. Supabase → **Authentication** → **URL Configuration**
+2. **Site URL** 改为：`https://你的项目名.pages.dev`
+3. **Redirect URLs** 增加：
+   - `https://你的项目名.pages.dev/**`
+   - `http://localhost:5173/**`（本地开发）
+4. Save
+
+### 7. 手机使用
+
+用手机浏览器打开 `https://xxx.pages.dev`，可「添加到主屏幕」。
+
+---
+
+## 方案 B：Vercel（国外网络更方便）
+
+见历史说明。国内若打不开 `*.vercel.app`，请改用方案 A。
 
 ---
 
 ## 方案 C：Netlify（可选）
 
-1. [app.netlify.com](https://app.netlify.com) 导入仓库
-2. Build command: `npm run build`，Publish directory: `dist`
-3. 添加两个 `VITE_*` 环境变量后部署
-
-同样使用 `public/_redirects` 做 SPA 回退。
-
----
-
-## 配置 Supabase（必做，否则登录可能失败）
-
-1. 打开 Supabase Dashboard → **Authentication** → **URL Configuration**
-2. **Site URL** 改成你的线上地址，例如：
-   `https://lookplog-xxx.vercel.app`
-3. **Redirect URLs** 增加：
-   - `https://lookplog-xxx.vercel.app/**`
-   - 本地开发可保留：`http://localhost:5173/**`
-
-若使用了 Storage / RLS，确认相关策略已按 `supabase/` 下 SQL 执行完毕（含 v2–v5 migration）。
-
----
-
-## 手机上使用
-
-1. 用手机浏览器打开线上 HTTPS 地址
-2. **iPhone（Safari）**：分享 → **添加到主屏幕**
-3. **Android（Chrome）**：菜单 → **添加到主屏幕** / **安装应用**
-
-之后可像 App 一样从桌面图标打开。
+1. [app.netlify.com](https://app.netlify.com) 导入仓库  
+2. Build: `npm run build`，Publish: `dist`  
+3. 添加两个 `VITE_*` 环境变量后部署  
 
 ---
 
 ## 常见问题
 
-**页面空白 / 白屏**  
-检查托管平台是否配置了 `VITE_SUPABASE_URL` 与 `VITE_SUPABASE_ANON_KEY`，改完后需重新 Deploy。
+**国内仍打不开**  
+换 4G/5G 试；或给 Cloudflare Pages 绑定国内可解析的自定义域名。
+
+**白屏 / 接口报错**  
+检查两个 `VITE_*` 是否已配置，改完后 **Retry deployment**。
 
 **能打开但不能登录**  
-检查 Supabase 的 Site URL / Redirect URLs 是否包含线上域名。
+检查 Supabase Site URL / Redirect URLs 是否已换成 `.pages.dev` 域名。
 
 **刷新子路由 404**  
-确认已使用本仓库的 `vercel.json` 或 `public/_redirects`；Cloudflare / Netlify 需以 `dist` 为输出目录重新部署。
+确认 `public/_redirects` 已在仓库中且重新部署成功。
 
-**改代码后不更新**  
-推送到已连接的 Git 分支后，平台会自动重新构建；也可在控制台手动 Redeploy。
+**改代码不更新**  
+`git push` 后 Cloudflare 会自动构建；也可在 Deployments 里手动 Retry。
