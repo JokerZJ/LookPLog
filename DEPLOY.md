@@ -47,12 +47,13 @@
 | **Production branch** | `master` 或 `main`（与你 GitHub 默认分支一致） |
 | **Framework preset** | `Vite`（没有就选 None） |
 | **Build command** | `npm run build` |
-| **Build output directory** | `dist` |
-| **Deploy command** | **留空**（不要填 `npx wrangler deploy`） |
-| **Root directory** | 留空（代码在仓库根目录） |
+| **Deploy command** | `npx wrangler deploy`（**不要留空**，留空会报 Invalid request body） |
+| **Root directory** | **留空** 或 `.`（**不要填 `/`**） |
+| **Build output / assets** | 由仓库 `wrangler.toml` 的 `[assets] directory = "./dist"` 指定 |
 
-> 若 Deploying 报错 `Missing entry-point to Worker script or to assets directory`：  
-> 说明误用了 `npx wrangler deploy`。到 Settings → Builds 清空 Deploy command，Output 设为 `dist`，再 Retry。 |
+> 若 Deploying 报错 `Missing entry-point ... assets directory`：  
+> 把最新 `wrangler.toml` push 到 GitHub 后再 Retry。  
+> 临时也可把 Deploy command 写成：`npx wrangler deploy --assets=./dist` |
 
 ### 4. 环境变量（必填）
 
